@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campus Marketplace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ECE8E1; --paper2:#F5F2EC; --line:#D6D0C4; --ink:#1C1B19; --ink2:#55524C; --muted:#8A857B;
+  --coral:#E8685F; --green:#6E9B5E; --teal:#2A9D8F; --mustard:#E0A938; --plum:#8C6A9E; --sky:#5B8FB9;
+  --card:#FFFDF8; --radius:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Archivo,system-ui,sans-serif;color:var(--ink);background:var(--paper);
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:32px 32px;min-height:100vh;line-height:1.45}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+a{color:inherit}
+.mono{font-family:"Space Mono",monospace}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+
+/* header */
+header{position:sticky;top:0;z-index:20;background:rgba(236,232,225,.92);backdrop-filter:blur(6px);border-bottom:2px solid var(--ink)}
+.nav{display:flex;align-items:center;gap:18px;height:64px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:20px;letter-spacing:-.02em;text-decoration:none}
+.logo-mark{width:34px;height:34px;background:var(--ink);color:var(--paper);display:grid;place-items:center;border-radius:4px;transform:rotate(-4deg);font-size:15px}
+.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-links a{text-decoration:none;font-weight:600;font-size:14px;padding:8px 12px;border-radius:4px;position:relative}
+.nav-links a:hover{background:rgba(0,0,0,.06)}
+.nav-links a.on{background:var(--ink);color:var(--paper)}
+.badge-dot{position:absolute;top:3px;right:3px;width:8px;height:8px;border-radius:50%;background:var(--coral)}
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14px;padding:10px 18px;border-radius:4px;border:2px solid var(--ink);background:var(--ink);color:var(--paper);transition:transform .12s, box-shadow .12s;text-decoration:none;white-space:nowrap}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:3px 3px 0 var(--coral)}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.coral{background:var(--coral);border-color:var(--coral);color:#fff}
+.btn.green{background:var(--green);border-color:var(--green);color:#fff}
+.btn.sm{padding:6px 12px;font-size:13px}
+.btn:disabled{opacity:.45;pointer-events:none}
+.menu-btn{display:none;margin-left:auto;font-size:22px;padding:6px 10px}
+@media (max-width:860px){
+  .nav-links{display:none;position:absolute;top:64px;left:0;right:0;background:var(--paper);flex-direction:column;padding:10px 20px;border-bottom:2px solid var(--ink)}
+  .nav-links.open{display:flex}
+  .menu-btn{display:block}
+  .nav .btn.sell-cta{display:none}
+}
+
+/* banner */
+.banner{background:var(--mustard);color:var(--ink);font-size:13px;text-align:center;padding:7px 16px;font-weight:600;border-bottom:2px solid var(--ink)}
+.banner.hidden{display:none}
+
+/* tape label */
+.tape{display:inline-block;font-family:"Space Mono",monospace;font-weight:700;font-size:12px;letter-spacing:.04em;padding:5px 14px;color:#fff;background:var(--coral);transform:rotate(-3deg);box-shadow:1px 2px 0 rgba(0,0,0,.12)}
+.tape.teal{background:var(--teal);transform:rotate(2deg)}
+.tape.green{background:var(--green);transform:rotate(-1deg)}
+.tape.ink{background:var(--ink)}
+
+/* hero */
+.hero{padding:70px 0 50px;position:relative}
+.hero h1{font-size:clamp(48px,9vw,112px);font-weight:900;line-height:.9;letter-spacing:-.04em;text-transform:uppercase;margin:18px 0 22px}
+.hero h1 span{display:block}
+.hero p.lead{font-size:clamp(17px,2vw,21px);max-width:620px;color:var(--ink2)}
+.hero-ctas{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap}
+.hero .sticky-note{position:absolute;right:4%;top:90px;width:150px;height:140px;background:var(--green);color:#fff;padding:16px;transform:rotate(6deg);box-shadow:3px 5px 0 rgba(0,0,0,.15);font-weight:700;font-size:15px;display:flex;flex-direction:column;justify-content:space-between}
+.hero .sticky-note b{font-size:42px;line-height:1;font-weight:900;display:block}
+@media (max-width:860px){.hero .sticky-note{display:none}}
+
+.search-big{display:flex;margin-top:30px;max-width:620px;border:2px solid var(--ink);background:var(--card);border-radius:4px;overflow:hidden}
+.search-big input{flex:1;min-width:0;border:0;padding:14px 16px;font-size:16px;background:transparent;outline:none}
+.search-big button{background:var(--ink);color:var(--paper);padding:0 22px;font-weight:700}
+
+/* stats strip */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border:2px solid var(--ink);background:var(--card);border-radius:var(--radius);margin:10px 0 50px}
+.stat{padding:20px 22px;border-right:2px solid var(--ink)}
+.stat:last-child{border-right:0}
+.stat b{display:block;font-size:32px;font-weight:900;letter-spacing:-.03em}
+.stat span{font-size:13px;color:var(--ink2);font-weight:500}
+@media (max-width:700px){.stats{grid-template-columns:1fr 1fr}.stat:nth-child(2){border-right:0}.stat:nth-child(-n+2){border-bottom:2px solid var(--ink)}}
+
+section{margin-bottom:60px}
+.sec-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.sec-head h2{font-size:clamp(28px,4vw,40px);font-weight:900;letter-spacing:-.03em;text-transform:uppercase;line-height:1}
+.sec-head .link{font-weight:700;font-size:14px;text-decoration:underline;text-underline-offset:3px}
+
+/* categories */
+.cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.cat{background:var(--card);border:2px solid var(--ink);border-radius:var(--radius);padding:16px;text-align:left;display:flex;flex-direction:column;gap:10px;transition:transform .12s, box-shadow .12s}
+.cat:hover{transform:translate(-3px,-3px);box-shadow:4px 4px 0 var(--ink)}
+.cat .ico{width:44px;height:44px;border-radius:4px;display:grid;place-items:center;color:#fff}
+.cat b{font-size:15px}
+.cat small{color:var(--muted);font-size:12px}
+
+/* listing cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
+.card{background:var(--card);border:2px solid var(--ink);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;text-align:left;transition:transform .12s, box-shadow .12s;position:relative}
+.card:hover{transform:translate(-3px,-3px);box-shadow:5px 5px 0 var(--ink)}
+.thumb{aspect-ratio:4/3;background:var(--paper2);position:relative;overflow:hidden;border-bottom:2px solid var(--ink)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .ph{width:100%;height:100%;display:grid;place-items:center;color:#fff}
+.thumb .ph svg{width:64px;height:64px;opacity:.95}
+.thumb .tag{position:absolute;top:10px;left:10px}
+.thumb .sold{position:absolute;inset:0;background:rgba(28,27,25,.62);display:grid;place-items:center}
+.thumb .sold span{font-weight:900;font-size:26px;color:#fff;border:3px solid #fff;padding:4px 14px;transform:rotate(-8deg);letter-spacing:.06em}
+.card-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card-title{font-weight:700;font-size:15px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.price-row{display:flex;align-items:baseline;gap:8px}
+.price{font-weight:900;font-size:21px;letter-spacing:-.02em}
+.mrp{color:var(--muted);text-decoration:line-through;font-size:13px}
+.off{font-family:"Space Mono",monospace;font-size:11px;font-weight:700;color:var(--green)}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:6px}
+.chip{font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;background:var(--paper);border:1px solid var(--line);color:var(--ink2);white-space:nowrap}
+.chip.v{background:#E3EFE0;border-color:#B9D3B1;color:#3E6B33}
+.save-btn{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;background:var(--card);border:2px solid var(--ink);display:grid;place-items:center;z-index:2;font-size:15px}
+.save-btn.on{background:var(--coral);border-color:var(--coral);color:#fff}
+
+/* browse layout */
+.browse{display:grid;grid-template-columns:240px 1fr;gap:26px;padding:34px 0 60px}
+.filters{background:var(--card);border:2px solid var(--ink);border-radius:var(--radius);padding:18px;align-self:start;position:sticky;top:84px;display:flex;flex-direction:column;gap:16px}
+.filters h4{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-weight:600;font-size:13px}
+.inp, select.inp, textarea.inp{width:100%;border:2px solid var(--ink);border-radius:4px;padding:10px 12px;background:#fff;outline:none;font-size:14px}
+.inp:focus{box-shadow:3px 3px 0 var(--teal)}
+textarea.inp{min-height:110px;resize:vertical}
+.cat-list{display:flex;flex-direction:column;gap:2px}
+.cat-list button{text-align:left;padding:7px 10px;border-radius:4px;font-size:14px;font-weight:500;display:flex;justify-content:space-between}
+.cat-list button:hover{background:var(--paper)}
+.cat-list button.on{background:var(--ink);color:var(--paper)}
+.toolbar{display:flex;gap:12px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
+.toolbar .inp{max-width:360px}
+.toolbar .count{margin-left:auto;font-size:13px;color:var(--ink2);font-weight:600}
+@media (max-width:860px){.browse{grid-template-columns:1fr}.filters{position:static}}
+
+.empty{background:var(--card);border:2px dashed var(--ink2);border-radius:var(--radius);padding:44px 20px;text-align:center;color:var(--ink2)}
+.empty b{display:block;font-size:20px;color:var(--ink);margin-bottom:6px}
+.empty .btn{margin-top:16px}
+
+/* sell form */
+.page{padding:40px 0 70px}
+.page-title{font-size:clamp(34px,5vw,56px);font-weight:900;text-transform:uppercase;letter-spacing:-.035em;line-height:.95;margin:12px 0 8px}
+.page-sub{color:var(--ink2);margin-bottom:28px;max-width:640px}
+.panel{background:var(--card);border:2px solid var(--ink);border-radius:var(--radius);padding:24px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-grid .full{grid-column:1/-1}
+@media (max-width:700px){.form-grid{grid-template-columns:1fr}}
+.sell-layout{display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start}
+@media (max-width:900px){.sell-layout{grid-template-columns:1fr}}
+.dropzone{border:2px dashed var(--ink2);border-radius:4px;padding:20px;text-align:center;background:var(--paper2);cursor:pointer;font-size:14px;color:var(--ink2)}
+.dropzone:hover,.dropzone.drag{border-color:var(--teal);background:#E5F2F0}
+.previews{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
+.previews div{position:relative;width:86px;height:86px;border:2px solid var(--ink);border-radius:4px;overflow:hidden}
+.previews img{width:100%;height:100%;object-fit:cover}
+.previews button{position:absolute;top:2px;right:2px;background:var(--ink);color:#fff;width:20px;height:20px;border-radius:50%;font-size:12px;line-height:1}
+.tips li{margin:0 0 10px 18px;font-size:14px;color:var(--ink2)}
+.hint{font-size:12px;color:var(--muted)}
+.err{color:#B3362D;font-size:13px;font-weight:600}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(28,27,25,.55);z-index:50;display:none;align-items:center;justify-content:center;padding:20px}
+.overlay.open{display:flex}
+.modal{background:var(--card);border:2px solid var(--ink);border-radius:var(--radius);max-width:900px;width:100%;max-height:92vh;overflow:auto;box-shadow:8px 8px 0 var(--ink);position:relative}
+.modal.small{max-width:420px;padding:26px}
+.modal .close{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;background:var(--ink);color:#fff;font-size:18px;z-index:3}
+.detail{display:grid;grid-template-columns:1.1fr 1fr}
+.detail .gallery{background:var(--paper2);border-right:2px solid var(--ink);display:flex;flex-direction:column}
+.detail .gallery .main{flex:1;min-height:320px;display:grid;place-items:center;overflow:hidden}
+.detail .gallery .main img{width:100%;height:100%;object-fit:contain;background:#fff}
+.detail .gallery .main .ph{width:100%;height:100%;display:grid;place-items:center;color:#fff}
+.detail .gallery .main .ph svg{width:120px;height:120px}
+.thumbs{display:flex;gap:8px;padding:10px;border-top:2px solid var(--ink)}
+.thumbs button{width:60px;height:60px;border:2px solid var(--line);border-radius:4px;overflow:hidden}
+.thumbs button.on{border-color:var(--ink)}
+.thumbs img{width:100%;height:100%;object-fit:cover}
+.detail .info{padding:28px 26px;display:flex;flex-direction:column;gap:14px}
+.detail h3{font-size:26px;font-weight:800;line-height:1.15;letter-spacing:-.02em;padding-right:30px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:14px}
+.kv dt{color:var(--muted);font-weight:500}
+.kv dd{font-weight:600}
+.seller{display:flex;align-items:center;gap:12px;padding:12px;border:2px solid var(--line);border-radius:4px}
+.avatar{width:40px;height:40px;border-radius:50%;background:var(--teal);color:#fff;display:grid;place-items:center;font-weight:800;flex-shrink:0}
+.desc{font-size:14px;color:var(--ink2);white-space:pre-wrap}
+@media (max-width:760px){.detail{grid-template-columns:1fr}.detail .gallery{border-right:0;border-bottom:2px solid var(--ink)}}
+
+/* chats */
+.chat-layout{display:grid;grid-template-columns:300px 1fr;border:2px solid var(--ink);border-radius:var(--radius);background:var(--card);height:min(640px,75vh);overflow:hidden}
+.chat-list{border-right:2px solid var(--ink);overflow:auto}
+.chat-item{display:flex;gap:10px;padding:14px;border-bottom:1px solid var(--line);text-align:left;width:100%;align-items:center}
+.chat-item:hover{background:var(--paper2)}
+.chat-item.on{background:var(--paper)}
+.chat-item .t{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-item .s{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-main{display:flex;flex-direction:column;min-width:0}
+.chat-head{padding:14px 18px;border-bottom:2px solid var(--ink);display:flex;align-items:center;gap:12px}
+.msgs{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:8px;background:var(--paper2)}
+.msg{max-width:72%;padding:9px 13px;border-radius:12px;font-size:14px;border:1.5px solid var(--ink);background:#fff;white-space:pre-wrap;word-wrap:break-word}
+.msg.me{align-self:flex-end;background:var(--ink);color:var(--paper)}
+.msg time{display:block;font-size:10px;opacity:.6;margin-top:3px;font-family:"Space Mono",monospace}
+.chat-input{display:flex;gap:10px;padding:12px;border-top:2px solid var(--ink)}
+.chat-input .inp{flex:1}
+.quick{display:flex;gap:6px;padding:8px 12px 0;flex-wrap:wrap}
+.quick button{font-size:12px;border:1.5px solid var(--ink2);border-radius:20px;padding:4px 10px;background:#fff}
+@media (max-width:760px){.chat-layout{grid-template-columns:1fr}.chat-layout.has-active .chat-list{display:none}.chat-layout:not(.has-active) .chat-main{display:none}}
+
+/* my listings table */
+.mine-row{display:grid;grid-template-columns:72px 1fr auto;gap:16px;align-items:center;padding:14px;border-bottom:1px solid var(--line)}
+.mine-row:last-child{border-bottom:0}
+.mine-row .mini{width:72px;height:72px;border:2px solid var(--ink);border-radius:4px;overflow:hidden}
+.mine-row .mini img{width:100%;height:100%;object-fit:cover}
+.mine-row .mini .ph{width:100%;height:100%;display:grid;place-items:center;color:#fff}
+.mine-row .mini .ph svg{width:32px;height:32px}
+.mine-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tabs button{padding:8px 14px;border:2px solid var(--ink);border-radius:4px;font-weight:700;font-size:13px;background:var(--card)}
+.tabs button.on{background:var(--ink);color:var(--paper)}
+
+/* about */
+.about-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.obj{background:var(--card);border:2px solid var(--ink);border-radius:var(--radius);padding:22px;position:relative}
+.obj .tape{position:absolute;top:-12px;left:16px}
+.obj p{margin-top:10px;font-size:15px;color:var(--ink2)}
+.quote{background:var(--ink);color:var(--paper);padding:34px;border-radius:var(--radius);font-size:clamp(19px,2.5vw,26px);font-weight:700;line-height:1.3;letter-spacing:-.01em}
+.quote small{display:block;font-size:13px;font-weight:500;opacity:.65;margin-top:14px;font-family:"Space Mono",monospace}
+.stack{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.stack div{background:var(--card);border:2px solid var(--ink);border-radius:var(--radius);padding:14px}
+.stack small{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
+.stack b{display:block;margin-top:4px}
+.roadmap{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.roadmap div{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--card);border:2px solid var(--line);border-radius:var(--radius);font-size:14px;font-weight:500}
+.roadmap i{font-style:normal;font-family:"Space Mono",monospace;font-size:11px;font-weight:700;color:#fff;background:var(--teal);padding:2px 6px;border-radius:3px;margin-top:1px}
+.roadmap i.done{background:var(--green)}
+@media (max-width:700px){.about-grid{grid-template-columns:1fr}}
+
+/* leaderboard */
+.green-wrap{display:grid;grid-template-columns:1.2fr 1fr;gap:18px}
+.leader{background:var(--card);border:2px solid var(--ink);border-radius:var(--radius)}
+.leader-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.leader-row:last-child{border-bottom:0}
+.leader-row .rk{font-family:"Space Mono",monospace;font-weight:700;width:26px;color:var(--muted)}
+.leader-row .pts{margin-left:auto;font-weight:900;color:var(--green)}
+.impact{background:var(--green);color:#fff;border:2px solid var(--ink);border-radius:var(--radius);padding:24px;display:flex;flex-direction:column;gap:16px}
+.impact b{font-size:40px;font-weight:900;line-height:1;letter-spacing:-.03em;display:block}
+.impact span{font-size:13px;opacity:.9}
+@media (max-width:760px){.green-wrap{grid-template-columns:1fr}}
+
+/* how it works */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.step{background:var(--card);border:2px solid var(--ink);border-radius:var(--radius);padding:22px}
+.step .n{font-family:"Space Mono",monospace;font-weight:700;font-size:13px;color:var(--coral)}
+.step h4{font-size:19px;font-weight:800;margin:6px 0}
+.step p{font-size:14px;color:var(--ink2)}
+@media (max-width:760px){.steps{grid-template-columns:1fr}}
+
+#app{min-height:calc(100vh - 160px)}
+footer{border-top:2px solid var(--ink);padding:30px 0;font-size:13px;color:var(--ink2);background:rgba(236,232,225,.9)}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ink);color:var(--paper);padding:12px 20px;border-radius:4px;font-weight:600;font-size:14px;z-index:60;transition:transform .25s;box-shadow:4px 4px 0 var(--coral)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.verify{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#3E6B33}
+.switch{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600}
+.switch input{width:18px;height:18px;accent-color:var(--ink)}
+.loading{padding:40px;text-align:center;color:var(--ink2);font-weight:600}
+</style>
+</head>
+<body>
+<div class="banner hidden" id="banner"></div>
+<header>
+  <div class="wrap nav">
+    <a href="#home" class="logo"><span class="logo-mark">CM</span>Campus Marketplace</a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#home" data-r="home">Home</a>
+      <a href="#browse" data-r="browse">Browse</a>
+      <a href="#chats" data-r="chats">Chats<span class="badge-dot" id="chatDot" style="display:none"></span></a>
+      <a href="#mine" data-r="mine">My Listings</a>
+      <a href="#green" data-r="green">Green Points</a>
+      <a href="#about" data-r="about">About</a>
+    </nav>
+    <a href="#sell" class="btn coral sell-cta">+ Sell an item</a>
+    <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+  </div>
+</header>
+
+<main id="app"></main>
+
+<footer>
+  <div class="wrap">
+    <div><b>Campus Marketplace</b> · Student-to-student marketplace · Dept. of CSE, IIMTU 2026</div>
+    <div>By Aditi Singh &amp; Ananya Chaudhary · Guide: Ms. Rukhsar Saifi</div>
+  </div>
+</footer>
+
+<div class="overlay" id="overlay"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- constants ---------- */
+const ICONS = {
+  book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2.5z"/><path d="M4 19.5A2 2 0 0 0 6 22h13v-3"/><path d="M9 7h6M9 11h4"/></svg>',
+  flask:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6L4.5 18.5A2 2 0 0 0 6.2 21.5h11.6a2 2 0 0 0 1.7-3L14 9V3"/><path d="M7 15h10"/></svg>',
+  chip:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M2 20h20M9 16v4M15 16v4"/></svg>',
+  chair:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18v4H3zM5 14v7M19 14v7M6 10V4h12v6"/></svg>',
+  ruler:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 17 3l4 4L7 21z"/><path d="m7 13 2 2M10 10l2 2M13 7l2 2"/></svg>',
+  notes:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg>',
+  bike:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17" r="3.5"/><circle cx="18.5" cy="17" r="3.5"/><path d="M5.5 17 9 9h6l3.5 8M9 9 12 17h1M14 6h3"/></svg>',
+  box:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>'
+};
+const CATS = [
+  {id:'textbooks', name:'Textbooks', icon:'book', color:'var(--coral)', co2:2.5, hint:'By semester & branch'},
+  {id:'lab', name:'Lab Kits & Coats', icon:'flask', color:'var(--teal)', co2:3},
+  {id:'electronics', name:'Electronics', icon:'chip', color:'var(--sky)', co2:25, hint:'Calculators, laptops'},
+  {id:'furniture', name:'Hostel Furniture', icon:'chair', color:'var(--mustard)', co2:30},
+  {id:'drafters', name:'Drafters & Stationery', icon:'ruler', color:'var(--plum)', co2:1.5},
+  {id:'notes', name:'Notes & PYQs', icon:'notes', color:'var(--green)', co2:0.8},
+  {id:'cycles', name:'Cycles & Sports', icon:'bike', color:'#C2703D', co2:40},
+  {id:'other', name:'Other', icon:'box', color:'var(--ink2)', co2:5}
+];
+const CAT = Object.fromEntries(CATS.map(c=>[c.id,c]));
+const BRANCHES = ['CSE','IT','ECE','ME','CE','EE','BBA','B.Pharm','Any'];
+const SEMS = ['1','2','3','4','5','6','7','8','Any'];
+const CONDITIONS = ['Like new','Good','Fair','Well used'];
+const PICKUPS = ['Main Gate','Central Library','CSE Block','Canteen','Boys Hostel','Girls Hostel','Admin Block','Sports Ground'];
+const DEFAULT_DOMAINS = ['.edu','.ac.in','.edu.in','iimtindia.net'];
+
+/* ---------- state ---------- */
+const S = {
+  db:null, user:null, uid:null, me:null, live:false, loading:false, stale:false,
+  listings:[], chats:[], names:{}, saved:new Set(),
+  config:{requireVerified:false, domains:DEFAULT_DOMAINS.join(', ')},
+  canWrite:true, isOwner:false,
+  f:{q:'',cat:'all',branch:'Any',sem:'Any',cond:'all',sort:'new',max:''},
+  activeChat:null, msgs:[], msgUnsub:null, mineTab:'active',
+  draftImages:[], seenChats:{}
+};
+
+/* ---------- demo data (used only when shared storage isn't available) ---------- */
+const DEMO_NOW = Date.now();
+const DEMO = [
+  ['Engineering Mathematics – B.S. Grewal (44th ed.)','textbooks','Any','1',280,895,'Good','Central Library','Some pencil highlights in ch. 3–5, otherwise clean. Perfect for M1 & M2.'],
+  ['Scientific Calculator Casio fx-991ES Plus','electronics','Any','Any',650,1250,'Like new','CSE Block','Used for 2 semesters, comes with cover. All functions work.'],
+  ['Engineering Drawing Drafter + Mini Drafter Set','drafters','ME','1',350,900,'Good','Main Gate','Omega drafter with clamps, set squares and compass box included.'],
+  ['Chemistry Lab Coat (M) + Safety Goggles','lab','Any','2',180,550,'Good','Canteen','Washed and ironed. Goggles unscratched.'],
+  ['Study Table with Shelf (hostel size)','furniture','Any','Any',1200,3200,'Fair','Boys Hostel','Sturdy, minor scratches. Pick up from Block B, room 214.'],
+  ['DSA Handwritten Notes + 5 years PYQs (Sem 3)','notes','CSE','3',120,0,'Like new','CSE Block','Neat notes covering arrays to graphs, plus solved previous-year papers.'],
+  ['Operating System Concepts – Galvin','textbooks','CSE','4',420,1100,'Good','Central Library','9th edition. Cover slightly worn.'],
+  ['Arduino Uno Starter Kit (sensors, breadboard)','electronics','ECE','5',900,2100,'Good','CSE Block','Used for one mini project. Includes jumper wires, LEDs, ultrasonic sensor.'],
+  ['Hero Sprint Cycle (26")','cycles','Any','Any',2500,6500,'Fair','Girls Hostel','Recently serviced, new brake pads. Great for getting around campus.'],
+  ['Basic Electrical Engineering – V.K. Mehta','textbooks','Any','2',220,650,'Well used','Admin Block','Old but complete. All pages intact.']
+].map((r,i)=>({id:'demo'+i,title:r[0],category:r[1],branch:r[2],semester:r[3],price:r[4],mrp:r[5],condition:r[6],pickup:r[7],description:r[8],images:[],sellerId:'demo-seller-'+(i%4),sellerLabel:['Riya (CSE, 4th yr)','Arjun (ME, 4th yr)','Sneha (ECE, 3rd yr)','Kabir (CSE, 4th yr)'][i%4],sellerVerified:true,status:i===4||i===9?'sold':'active',createdAt:DEMO_NOW-i*3600e3*7,sample:true}));
+
+/* ---------- helpers ---------- */
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rupee = n=>'₹'+Number(n||0).toLocaleString('en-IN');
+const seg = s=>String(s).replace(/[^A-Za-z0-9_\-.~:@+]/g,'-').slice(0,180);
+const ago = t=>{const d=(Date.now()-t)/1000; if(d<60)return'just now'; if(d<3600)return Math.floor(d/60)+'m ago'; if(d<86400)return Math.floor(d/3600)+'h ago'; return Math.floor(d/86400)+'d ago';};
+const initials = n=>(String(n||'?').replace(/\(.*?\)/g,'').replace(/[^\p{L}\s]/gu,'').trim()||'?').split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase();
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2600)}
+function nameOf(id, l){ if(l&&l.sellerLabel&&id===l.sellerId) return l.sellerLabel; if(id===S.uid) return 'You'; return S.names[id]||'Student'; }
+function catPh(cat, size){const c=CAT[cat]||CAT.other;return `<div class="ph" style="background:${c.color}">${ICONS[c.icon]}</div>`}
+function discount(l){return l.mrp>l.price&&l.mrp>0?Math.round((1-l.price/l.mrp)*100):0}
+function domainsList(){return String(S.config.domains||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean)}
+function emailVerified(email){ if(!email) return false; email=email.toLowerCase(); return domainsList().some(d=>d.startsWith('.')?email.endsWith(d):email.endsWith('@'+d)||email.endsWith('.'+d)); }
+function meVerified(){ return emailVerified(S.me?.email) }
+function canParticipate(){ return !S.config.requireVerified || meVerified() || S.isOwner }
+
+/* ---------- routing ---------- */
+const ROUTES=['home','browse','sell','chats','mine','green','about'];
+function route(){const h=location.hash.replace('#','');return ROUTES.includes(h)?h:'home'}
+window.addEventListener('hashchange',()=>{ $('#navLinks').classList.remove('open'); render(); window.scrollTo(0,0); });
+$('#menuBtn').onclick=()=>$('#navLinks').classList.toggle('open');
+
+/* ---------- render ---------- */
+function render(){
+  const r=route();
+  document.querySelectorAll('#navLinks a').forEach(a=>a.classList.toggle('on',a.dataset.r===r));
+  const views={home:viewHome,browse:viewBrowse,sell:viewSell,chats:viewChats,mine:viewMine,green:viewGreen,about:viewAbout};
+  $('#app').innerHTML=views[r]();
+  after[r]?.();
+  updateBanner(); updateChatDot();
+}
+const after={};
+
+function cardHTML(l){
+  const d=discount(l), saved=S.saved.has(l.id);
+  return `<div class="card" data-open="${esc(l.id)}" role="button" tabindex="0">
+    <button class="save-btn ${saved?'on':''}" data-save="${esc(l.id)}" title="Save">${saved?'♥':'♡'}</button>
+    <div class="thumb">${l.images?.[0]?`<img src="${esc(l.images[0])}" alt="">`:catPh(l.category)}
+      ${l.status==='sold'?'<div class="sold"><span>SOLD</span></div>':''}</div>
+    <div class="card-body">
+      <div class="card-title">${esc(l.title)}</div>
+      <div class="price-row"><span class="price">${rupee(l.price)}</span>${l.mrp>l.price?`<span class="mrp">${rupee(l.mrp)}</span>`:''}${d?`<span class="off">${d}% OFF</span>`:''}</div>
+      <div class="meta"><span class="chip">${esc(CAT[l.category]?.name||'Other')}</span>${l.semester&&l.semester!=='Any'?`<span class="chip">Sem ${esc(l.semester)}</span>`:''}${l.branch&&l.branch!=='Any'?`<span class="chip">${esc(l.branch)}</span>`:''}<span class="chip">📍 ${esc(l.pickup)}</span>${l.sellerVerified?'<span class="chip v">✓ Verified</span>':''}</div>
+    </div></div>`;
+}
+function bindCards(root=document){
+  root.querySelectorAll('[data-open]').forEach(el=>{
+    el.onclick=e=>{ if(e.target.closest('[data-save]')) return; openListing(el.dataset.open); };
+    el.onkeydown=e=>{ if(e.key==='Enter') openListing(el.dataset.open); };
+  });
+  root.querySelectorAll('[data-save]').forEach(b=>b.onclick=e=>{e.stopPropagation();toggleSave(b.dataset.save)});
+}
+
+function stats(){
+  const sold=S.listings.filter(l=>l.status==='sold');
+  const active=S.listings.filter(l=>l.status!=='sold');
+  const saved=sold.reduce((a,l)=>a+Math.max(0,(l.mrp||0)-(l.price||0)),0);
+  const co2=sold.reduce((a,l)=>a+(CAT[l.category]?.co2||5),0);
+  return {active:active.length, sold:sold.length, saved, co2:Math.round(co2), sellers:new Set(S.listings.map(l=>l.sellerId)).size};
+}
+
+function viewHome(){
+  const st=stats();
+  const latest=S.listings.filter(l=>l.status!=='sold').slice(0,8);
+  const counts={}; S.listings.forEach(l=>{if(l.status!=='sold')counts[l.category]=(counts[l.category]||0)+1});
+  return `<div class="wrap">
+  <div class="hero">
+    <span class="tape">Students'</span>
+    <h1><span>Campus</span><span>Marketplace</span></h1>
+    <p class="lead">Seniors sell pre-owned textbooks, lab kits, drafters, electronics and hostel furniture. Juniors buy them cheap. Every seller is a verified student from your campus.</p>
+    <form class="search-big" id="heroSearch"><input name="q" placeholder="Search “Grewal”, “drafter”, “fx-991”…" autocomplete="off"><button>Search</button></form>
+    <div class="hero-ctas"><a href="#browse" class="btn">Browse items</a><a href="#sell" class="btn ghost">Sell something →</a></div>
+    <div class="sticky-note"><span>Free for students</span><div><b>0%</b>commission</div></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><b>${st.active}</b><span>Items listed now</span></div>
+    <div class="stat"><b>${st.sold}</b><span>Items passed on</span></div>
+    <div class="stat"><b>${rupee(st.saved)}</b><span>Saved by juniors</span></div>
+    <div class="stat"><b>${st.co2} kg</b><span>CO₂ kept out (est.)</span></div>
+  </div>
+  <section>
+    <div class="sec-head"><h2>Shop by category</h2><span class="tape teal">Academic-first</span></div>
+    <div class="cats">${CATS.map(c=>`<button class="cat" data-cat="${c.id}"><span class="ico" style="background:${c.color}">${ICONS[c.icon].replace('<svg','<svg width="24" height="24"')}</span><b>${c.name}</b><small>${counts[c.id]||0} available</small></button>`).join('')}</div>
+  </section>
+  <section>
+    <div class="sec-head"><h2>Fresh on campus</h2><a href="#browse" class="link">See all →</a></div>
+    ${S.loading?'<div class="loading">Loading listings…</div>':latest.length?`<div class="grid">${latest.map(cardHTML).join('')}</div>`:emptyListings()}
+  </section>
+  <section>
+    <div class="sec-head"><h2>How it works</h2></div>
+    <div class="steps">
+      <div class="step"><div class="n">01 / VERIFY</div><h4>Sign in with campus ID</h4><p>Your institutional email gets you a verified badge, so you know every buyer and seller studies here.</p></div>
+      <div class="step"><div class="n">02 / LIST OR FIND</div><h4>Post in 60 seconds</h4><p>Add photos, semester, branch and a pickup spot. Juniors can filter by exactly what their syllabus needs.</p></div>
+      <div class="step"><div class="n">03 / CHAT &amp; MEET</div><h4>Hand over on campus</h4><p>Agree on a price in chat, then meet at the library, canteen or hostel gate. No shipping and no fees.</p></div>
+    </div>
+  </section>
+  <section><div class="quote">“The best marketplace isn't the one with the most products. It's the one with the most trust.”<small>— CAMPUS MARKETPLACE</small></div></section>
+  </div>`;
+}
+after.home=()=>{
+  bindCards();
+  document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{S.f.cat=b.dataset.cat;location.hash='browse'});
+  $('#heroSearch').onsubmit=e=>{e.preventDefault();S.f.q=e.target.q.value.trim();location.hash='browse'};
+};
+function emptyListings(){
+  return `<div class="empty"><b>No listings yet</b>Be the first senior to pass something on.<br><a href="#sell" class="btn coral">+ Sell an item</a></div>`;
+}
+
+/* browse */
+function filtered(){
+  const f=S.f, q=f.q.toLowerCase();
+  let r=S.listings.filter(l=>
+    (f.cat==='all'||l.category===f.cat) &&
+    (f.branch==='Any'||l.branch===f.branch||l.branch==='Any') &&
+    (f.sem==='Any'||l.semester===f.sem||l.semester==='Any') &&
+    (f.cond==='all'||l.condition===f.cond) &&
+    (!f.max||l.price<=Number(f.max)) &&
+    (!q||(l.title+' '+l.description+' '+(CAT[l.category]?.name||'')).toLowerCase().includes(q))
+  );
+  const sorters={new:(a,b)=>b.createdAt-a.createdAt,low:(a,b)=>a.price-b.price,high:(a,b)=>b.price-a.price,deal:(a,b)=>discount(b)-discount(a)};
+  r.sort(sorters[f.sort]);
+  r.sort((a,b)=>(a.status==='sold')-(b.status==='sold'));
+  return r;
+}
+function viewBrowse(){
+  const f=S.f;
+  const counts={all:S.listings.filter(l=>l.status!=='sold').length}; S.listings.forEach(l=>{if(l.status!=='sold')counts[l.category]=(counts[l.category]||0)+1});
+  return `<div class="wrap browse">
+    <aside class="filters">
+      <div><h4>Category</h4><div class="cat-list">
+        <button data-fcat="all" class="${f.cat==='all'?'on':''}"><span>All items</span><span>${counts.all}</span></button>
+        ${CATS.map(c=>`<button data-fcat="${c.id}" class="${f.cat===c.id?'on':''}"><span>${c.name}</span><span>${counts[c.id]||0}</span></button>`).join('')}
+      </div></div>
+      <div class="field"><h4>Branch</h4><select class="inp" id="fBranch">${BRANCHES.map(b=>`<option ${f.branch===b?'selected':''} value="${b}">${b==='Any'?'All branches':b}</option>`).join('')}</select></div>
+      <div class="field"><h4>Semester</h4><select class="inp" id="fSem">${SEMS.map(s=>`<option ${f.sem===s?'selected':''} value="${s}">${s==='Any'?'All semesters':'Semester '+s}</option>`).join('')}</select></div>
+      <div class="field"><h4>Condition</h4><select class="inp" id="fCond"><option value="all">Any condition</option>${CONDITIONS.map(c=>`<option ${f.cond===c?'selected':''}>${c}</option>`).join('')}</select></div>
+      <div class="field"><h4>Max price (₹)</h4><input class="inp" id="fMax" type="number" min="0" placeholder="No limit" value="${esc(f.max)}"></div>
+      <button class="btn ghost sm" id="fReset">Reset filters</button>
+    </aside>
+    <div>
+      <div class="toolbar">
+        <input class="inp" id="fQ" placeholder="Search items…" value="${esc(f.q)}">
+        <select class="inp" id="fSort" style="max-width:190px">
+          <option value="new" ${f.sort==='new'?'selected':''}>Newest first</option>
+          <option value="low" ${f.sort==='low'?'selected':''}>Price: low to high</option>
+          <option value="high" ${f.sort==='high'?'selected':''}>Price: high to low</option>
+          <option value="deal" ${f.sort==='deal'?'selected':''}>Biggest discount</option>
+        </select>
+        <span class="count" id="fCount"></span>
+      </div>
+      <div id="results"></div>
+    </div>
+  </div>`;
+}
+function drawResults(){
+  const el=$('#results'); if(!el) return;
+  const r=filtered();
+  $('#fCount').textContent=`${r.length} item${r.length===1?'':'s'}`;
+  el.innerHTML = S.loading?'<div class="loading">Loading listings…</div>' : r.length?`<div class="grid">${r.map(cardHTML).join('')}</div>`:(S.listings.length?`<div class="empty"><b>Nothing matches</b>Try a different search or clear some filters.</div>`:emptyListings());
+  bindCards(el);
+}
+after.browse=()=>{
+  drawResults();
+  document.querySelectorAll('[data-fcat]').forEach(b=>b.onclick=()=>{S.f.cat=b.dataset.fcat;render()});
+  const bind=(id,k,ev='change')=>$(id).addEventListener(ev,e=>{S.f[k]=e.target.value;drawResults()});
+  bind('#fBranch','branch');bind('#fSem','sem');bind('#fCond','cond');bind('#fSort','sort');bind('#fMax','max','input');bind('#fQ','q','input');
+  $('#fReset').onclick=()=>{S.f={q:'',cat:'all',branch:'Any',sem:'Any',cond:'all',sort:'new',max:''};render()};
+};
+
+/* listing detail */
+function openListing(id){
+  const l=S.listings.find(x=>x.id===id); if(!l) return;
+  const mine=l.sellerId===S.uid;
+  const d=discount(l);
+  const imgs=l.images||[];
+  $('#modal').className='modal';
+  $('#modal').innerHTML=`<button class="close" data-close>×</button>
+  <div class="detail">
+    <div class="gallery"><div class="main" id="gMain">${imgs[0]?`<img src="${esc(imgs[0])}" alt="">`:catPh(l.category)}</div>
+      ${imgs.length>1?`<div class="thumbs">${imgs.map((s,i)=>`<button data-gi="${i}" class="${i?'':'on'}"><img src="${esc(s)}" alt=""></button>`).join('')}</div>`:''}
+    </div>
+    <div class="info">
+      <span class="tape ${l.status==='sold'?'ink':'teal'}" style="align-self:flex-start">${l.status==='sold'?'SOLD':esc(CAT[l.category]?.name||'Other')}</span>
+      <h3>${esc(l.title)}</h3>
+      <div class="price-row"><span class="price" style="font-size:30px">${rupee(l.price)}</span>${l.mrp>l.price?`<span class="mrp">${rupee(l.mrp)}</span>`:''}${d?`<span class="off">SAVE ${d}%</span>`:''}</div>
+      <dl class="kv">
+        <dt>Condition</dt><dd>${esc(l.condition)}</dd>
+        <dt>Branch</dt><dd>${esc(l.branch==='Any'?'All branches':l.branch)}</dd>
+        <dt>Semester</dt><dd>${esc(l.semester==='Any'?'Any':'Semester '+l.semester)}</dd>
+        <dt>Pickup</dt><dd>📍 ${esc(l.pickup)}</dd>
+        <dt>Posted</dt><dd>${ago(l.createdAt)}</dd>
+      </dl>
+      ${l.description?`<div class="desc">${esc(l.description)}</div>`:''}
+      <div class="seller"><div class="avatar">${esc(initials(nameOf(l.sellerId,l)))}</div><div><b>${esc(nameOf(l.sellerId,l))}</b><br>${l.sellerVerified?'<span class="verify">✓ Campus-verified seller</span>':'<span class="hint">Email not campus-verified</span>'}</div></div>
+      ${mine?`<div style="display:flex;gap:8px;flex-wrap:wrap">${l.status!=='sold'?`<button class="btn green" data-sold="${esc(l.id)}">Mark as sold</button>`:''}<a class="btn ghost" href="#mine" data-close>Manage in My Listings</a></div>`
+        : l.status==='sold'?'<div class="hint">This item has been sold.</div>'
+        : l.sample?`<div class="hint">This is a sample listing to show how the marketplace works.</div>`
+        : `<button class="btn coral" data-chat="${esc(l.id)}">💬 Chat with seller</button>`}
+      <button class="btn ghost sm" data-save="${esc(l.id)}" style="align-self:flex-start">${S.saved.has(l.id)?'♥ Saved':'♡ Save for later'}</button>
+    </div>
+  </div>`;
+  openOverlay();
+  document.querySelectorAll('[data-gi]').forEach(b=>b.onclick=()=>{$('#gMain').innerHTML=`<img src="${esc(imgs[b.dataset.gi])}" alt="">`;document.querySelectorAll('[data-gi]').forEach(x=>x.classList.toggle('on',x===b))});
+  $('#modal [data-save]').onclick=()=>{toggleSave(l.id);openListing(l.id)};
+  const cb=$('#modal [data-chat]'); if(cb) cb.onclick=()=>startChat(l);
+  const sb=$('#modal [data-sold]'); if(sb) sb.onclick=async()=>{await markSold(l);closeOverlay()};
+}
+function openOverlay(){$('#overlay').classList.add('open');document.body.style.overflow='hidden'}
+function closeOverlay(){$('#overlay').classList.remove('open');document.body.style.overflow=''}
+$('#overlay').addEventListener('click',e=>{if(e.target.id==='overlay'||e.target.closest('[data-close]'))closeOverlay()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOverlay()});
+
+function confirmBox(title,text,okLabel){
+  return new Promise(res=>{
+    $('#modal').className='modal small';
+    $('#modal').innerHTML=`<h3 style="font-size:20px;font-weight:800;margin-bottom:8px">${esc(title)}</h3><p style="color:var(--ink2);font-size:14px;margin-bottom:20px">${esc(text)}</p><div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" id="cNo">Cancel</button><button class="btn coral" id="cYes">${esc(okLabel)}</button></div>`;
+    openOverlay();
+    $('#cNo').onclick=()=>{closeOverlay();res(false)};
+    $('#cYes').onclick=()=>{closeOverlay();res(true)};
+  });
+}
+
+/* sell */
+function viewSell(){
+  const blocked=!canParticipate() || (S.live && !S.canWrite);
+  return `<div class="wrap page">
+    <span class="tape">Seniors, pass it on</span>
+    <h1 class="page-title">Sell an item</h1>
+    <p class="page-sub">List it in under a minute. Juniors filter by semester and branch, so they'll find exactly what they need.</p>
+    ${blocked?`<div class="empty"><b>${!canParticipate()?'Campus verification required':'You can browse but not post'}</b>${!canParticipate()?`Selling is limited to students signed in with a campus email (${esc(domainsList().join(', '))}).`:'Ask the marketplace owner to give you Contributor access so you can list items.'}</div>`:`
+    <div class="sell-layout">
+    <form class="panel" id="sellForm" novalidate>
+      <div class="form-grid">
+        <div class="field full"><label>Item title *</label><input class="inp" name="title" maxlength="90" placeholder="e.g. Engineering Mathematics by B.S. Grewal"></div>
+        <div class="field"><label>Category *</label><select class="inp" name="category">${CATS.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select></div>
+        <div class="field"><label>Condition *</label><select class="inp" name="condition">${CONDITIONS.map(c=>`<option>${c}</option>`).join('')}</select></div>
+        <div class="field"><label>Branch</label><select class="inp" name="branch">${BRANCHES.map(b=>`<option value="${b}" ${b==='Any'?'selected':''}>${b==='Any'?'Any branch':b}</option>`).join('')}</select></div>
+        <div class="field"><label>Semester</label><select class="inp" name="semester">${SEMS.map(s=>`<option value="${s}" ${s==='Any'?'selected':''}>${s==='Any'?'Any semester':'Semester '+s}</option>`).join('')}</select></div>
+        <div class="field"><label>Your price (₹) *</label><input class="inp" name="price" type="number" min="0" placeholder="250"></div>
+        <div class="field"><label>Original price (₹)</label><input class="inp" name="mrp" type="number" min="0" placeholder="Optional, shows the discount"></div>
+        <div class="field full"><label>Pickup spot on campus *</label><select class="inp" name="pickup">${PICKUPS.map(p=>`<option>${p}</option>`).join('')}</select></div>
+        <div class="field full"><label>Description</label><textarea class="inp" name="description" maxlength="800" placeholder="Edition, wear, what's included, when you're free to meet…"></textarea></div>
+        <div class="field full"><label>Photos (up to 3)</label>
+          <div class="dropzone" id="drop">📷 Click or drop photos here<br><span class="hint">They're resized automatically</span></div>
+          <input type="file" id="fileIn" accept="image/*" multiple hidden>
+          <div class="previews" id="previews"></div>
+        </div>
+      </div>
+      <p class="err" id="sellErr" style="margin-top:12px"></p>
+      <div style="display:flex;gap:10px;margin-top:14px"><button class="btn coral" id="sellBtn">Publish listing</button><a href="#browse" class="btn ghost">Cancel</a></div>
+    </form>
+    <aside class="panel">
+      <h4 style="font-weight:800;margin-bottom:12px">Tips for a quick sale</h4>
+      <ul class="tips">
+        <li>Price textbooks at 30–50% of MRP. They sell within days.</li>
+        <li>Put the edition and author in the title.</li>
+        <li>Set semester &amp; branch so the right juniors see it.</li>
+        <li>A clear photo of the cover gets far more chats.</li>
+        <li>Meet in busy spots like the library or canteen.</li>
+      </ul>
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line);font-size:13px">
+        ${S.live?(meVerified()?'<span class="verify">✓ Your listings will show a campus-verified badge</span>':`<span class="hint">Sign in with a campus email (${esc(domainsList().slice(0,3).join(', '))}…) to earn the verified badge.</span>`):'<span class="hint">Preview mode: listings you post here won\'t be saved.</span>'}
+      </div>
+    </aside>
+    </div>`}
+  </div>`;
+}
+after.sell=()=>{
+  const form=$('#sellForm'); if(!form) return;
+  S.draftImages=[];
+  const drop=$('#drop'), fi=$('#fileIn');
+  drop.onclick=()=>fi.click();
+  fi.onchange=()=>addFiles(fi.files);
+  drop.ondragover=e=>{e.preventDefault();drop.classList.add('drag')};
+  drop.ondragleave=()=>drop.classList.remove('drag');
+  drop.ondrop=e=>{e.preventDefault();drop.classList.remove('drag');addFiles(e.dataTransfer.files)};
+  form.onsubmit=async e=>{
+    e.preventDefault();
+    const fd=Object.fromEntries(new FormData(form));
+    const err=$('#sellErr');
+    if(!fd.title.trim()) return err.textContent='Please add a title.';
+    if(fd.price===''||Number(fd.price)<0) return err.textContent='Please enter a valid price.';
+    err.textContent='';
+    const btn=$('#sellBtn'); btn.disabled=true; btn.textContent='Publishing…';
+    const l={title:fd.title.trim(),category:fd.category,condition:fd.condition,branch:fd.branch,semester:fd.semester,price:Math.round(Number(fd.price)),mrp:fd.mrp?Math.round(Number(fd.mrp)):0,pickup:fd.pickup,description:fd.description.trim(),images:S.draftImages.slice(),sellerId:S.uid,sellerVerified:meVerified(),status:'active',createdAt:Date.now()};
+    try{
+      if(S.live){ await S.db.collection('listings').add(l); }
+      else { S.listings.unshift({...l,id:'local'+Date.now()}); }
+      toast('Listing published 🎉'); location.hash='mine';
+    }catch(ex){
+      btn.disabled=false; btn.textContent='Publish listing';
+      err.textContent = ex?.code==='invalid_argument'?(l.images.length?'Couldn\'t save. Try fewer or smaller photos.':'You don\'t have permission to post here.') : ex?.code==='quota_exceeded'?'The marketplace is full right now. Ask the owner to clear old listings.' : 'Couldn\'t publish. Please try again.';
+    }
+  };
+};
+async function addFiles(files){
+  for(const f of [...files].filter(f=>f.type.startsWith('image/'))){
+    if(S.draftImages.length>=3){toast('Up to 3 photos');break}
+    try{ S.draftImages.push(await shrink(f)); }catch{ toast('Couldn\'t read that image'); }
+  }
+  drawPreviews();
+}
+function shrink(file){
+  return new Promise((res,rej)=>{
+    const img=new Image(), url=URL.createObjectURL(file);
+    img.onload=()=>{const max=560;let{width:w,height:h}=img;const k=Math.min(1,max/Math.max(w,h));w=Math.round(w*k);h=Math.round(h*k);
+      const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);URL.revokeObjectURL(url);res(c.toDataURL('image/jpeg',0.68))};
+    img.onerror=rej; img.src=url;
+  });
+}
+function drawPreviews(){
+  $('#previews').innerHTML=S.draftImages.map((s,i)=>`<div><img src="${s}" alt=""><button type="button" data-rm="${i}">×</button></div>`).join('');
+  document.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{S.draftImages.splice(+b.dataset.rm,1);drawPreviews()});
+}
+
+/* saved */
+async function toggleSave(id){
+  S.saved.has(id)?S.saved.delete(id):S.saved.add(id);
+  document.querySelectorAll(`[data-save="${CSS.escape(id)}"]`).forEach(b=>{const on=S.saved.has(id);if(b.classList.contains('save-btn')){b.classList.toggle('on',on);b.textContent=on?'♥':'♡'}});
+  if(S.live&&S.uid){ try{ await S.db.doc(`data/users/${S.uid}/prefs`).set({saved:[...S.saved]}); }catch{} }
+}
+
+/* mine */
+function viewMine(){
+  const mine=S.listings.filter(l=>l.sellerId===S.uid);
+  const savedL=S.listings.filter(l=>S.saved.has(l.id));
+  const tab=S.mineTab;
+  const list = tab==='saved'?savedL : mine.filter(l=>tab==='sold'?l.status==='sold':l.status!=='sold');
+  const pts=mine.filter(l=>l.status==='sold').length*10+mine.filter(l=>l.status!=='sold').length*2;
+  return `<div class="wrap page">
+    <span class="tape green">Your shelf</span>
+    <h1 class="page-title">My listings</h1>
+    <p class="page-sub">${S.live?(meVerified()?'<span class="verify">✓ Campus-verified</span> · ':'')+`You have <b>${pts}</b> Green Points.`:'Preview mode: anything you post here stays on this page only.'}</p>
+    <div class="tabs">
+      <button data-tab="active" class="${tab==='active'?'on':''}">Active (${mine.filter(l=>l.status!=='sold').length})</button>
+      <button data-tab="sold" class="${tab==='sold'?'on':''}">Sold (${mine.filter(l=>l.status==='sold').length})</button>
+      <button data-tab="saved" class="${tab==='saved'?'on':''}">Saved (${savedL.length})</button>
+    </div>
+    ${tab==='saved'?(list.length?`<div class="grid">${list.map(cardHTML).join('')}</div>`:'<div class="empty"><b>Nothing saved yet</b>Tap ♡ on any item to keep it here.</div>')
+    : list.length?`<div class="panel" style="padding:0">${list.map(l=>`<div class="mine-row">
+        <div class="mini">${l.images?.[0]?`<img src="${esc(l.images[0])}" alt="">`:catPh(l.category)}</div>
+        <div><b style="cursor:pointer" data-open="${esc(l.id)}">${esc(l.title)}</b><div class="hint">${rupee(l.price)} · ${esc(CAT[l.category]?.name||'')} · ${ago(l.createdAt)} · ${S.chats.filter(c=>c.listingId===l.id).length} chat(s)</div></div>
+        <div class="mine-actions">${l.status!=='sold'?`<button class="btn green sm" data-msold="${esc(l.id)}">Mark sold</button>`:`<button class="btn ghost sm" data-mrelist="${esc(l.id)}">Relist</button>`}<button class="btn ghost sm" data-mdel="${esc(l.id)}">Delete</button></div>
+      </div>`).join('')}</div>`
+    : `<div class="empty"><b>${tab==='sold'?'No sales yet':'No active listings'}</b>${tab==='sold'?'Items you mark as sold show up here.':'Got books or gear you no longer need?'}<br>${tab!=='sold'?'<a href="#sell" class="btn coral">+ Sell an item</a>':''}</div>`}
+  </div>`;
+}
+after.mine=()=>{
+  bindCards();
+  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{S.mineTab=b.dataset.tab;render()});
+  document.querySelectorAll('[data-msold]').forEach(b=>b.onclick=()=>markSold(S.listings.find(l=>l.id===b.dataset.msold)));
+  document.querySelectorAll('[data-mrelist]').forEach(b=>b.onclick=()=>updateListing(b.dataset.mrelist,{status:'active'}));
+  document.querySelectorAll('[data-mdel]').forEach(b=>b.onclick=async()=>{
+    const l=S.listings.find(x=>x.id===b.dataset.mdel);
+    if(!await confirmBox('Delete this listing?',`“${l.title}” will be removed for everyone.`,'Delete')) return;
+    try{ if(S.live) await S.db.doc('listings/'+l.id).delete(); else S.listings=S.listings.filter(x=>x.id!==l.id); toast('Listing deleted'); if(!S.live) render(); }catch{ toast('Couldn\'t delete. Try again.') }
+  });
+};
+async function markSold(l){ await updateListing(l.id,{status:'sold',soldAt:Date.now()}); toast('Marked as sold. +10 Green Points 🌱'); }
+async function updateListing(id,patch){
+  try{ if(S.live) await S.db.doc('listings/'+id).update(patch); else { Object.assign(S.listings.find(l=>l.id===id),patch); render(); } }
+  catch{ toast('Couldn\'t update. Try again.') }
+}
+
+/* chats */
+function chatIdFor(l){ return seg(l.id+'__'+S.uid) }
+async function startChat(l){
+  if(!canParticipate()){ toast('Chat is limited to campus-verified students'); return; }
+  const cid=chatIdFor(l);
+  const existing=S.chats.find(c=>c.id===cid);
+  if(!existing){
+    const c={listingId:l.id,listingTitle:l.title,price:l.price,category:l.category,sellerId:l.sellerId,buyerId:S.uid,participants:[l.sellerId,S.uid],lastText:'',updatedAt:Date.now()};
+    try{
+      if(S.live) await S.db.doc('chats/'+cid).set(c);
+      else S.chats.unshift({...c,id:cid});
+    }catch{ toast('Couldn\'t start the chat'); return; }
+  }
+  S.activeChat=cid; closeOverlay(); location.hash='chats'; if(route()==='chats') render();
+}
+function viewChats(){
+  const chats=[...S.chats].sort((a,b)=>b.updatedAt-a.updatedAt);
+  const c=chats.find(x=>x.id===S.activeChat);
+  if(!S.live) return `<div class="wrap page"><span class="tape teal">Real-time chat</span><h1 class="page-title">Chats</h1>
+    <div class="empty"><b>Chat needs a signed-in session</b>Open this page on claude.ai while signed in to message sellers. In preview mode, nothing gets sent.</div></div>`;
+  return `<div class="wrap page">
+    <span class="tape teal">Real-time chat</span>
+    <h1 class="page-title">Chats</h1>
+    <p class="page-sub">Agree on a price and a time, then meet at the pickup spot. Never pay before you've seen the item.</p>
+    ${chats.length?`<div class="chat-layout ${c?'has-active':''}">
+      <div class="chat-list">${chats.map(x=>{const other=x.sellerId===S.uid?x.buyerId:x.sellerId;const unread=x.updatedAt>(S.seenChats[x.id]||0)&&x.lastFrom&&x.lastFrom!==S.uid;
+        return `<button class="chat-item ${x.id===S.activeChat?'on':''}" data-cid="${esc(x.id)}"><div class="avatar" style="background:${CAT[x.category]?.color||'var(--teal)'}">${esc(initials(nameOf(other)))}</div><div style="min-width:0;flex:1"><div class="t">${unread?'● ':''}${esc(x.listingTitle)}</div><div class="s">${esc(nameOf(other))} · ${x.sellerId===S.uid?'buyer':'seller'}${x.lastText?' · '+esc(x.lastText):''}</div></div></button>`}).join('')}</div>
+      <div class="chat-main">${c?chatMain(c):'<div class="loading" style="margin:auto">Pick a conversation</div>'}</div>
+    </div>`:`<div class="empty"><b>No conversations yet</b>Open any listing and tap “Chat with seller”.<br><a href="#browse" class="btn">Browse items</a></div>`}
+  </div>`;
+}
+function chatMain(c){
+  const other=c.sellerId===S.uid?c.buyerId:c.sellerId;
+  const l=S.listings.find(x=>x.id===c.listingId);
+  const isBuyer=c.buyerId===S.uid;
+  return `<div class="chat-head"><button class="btn ghost sm" id="chatBack" style="padding:4px 10px">←</button><div class="avatar">${esc(initials(nameOf(other)))}</div><div style="flex:1;min-width:0"><b>${esc(nameOf(other))}</b><div class="hint" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.listingTitle)} · ${rupee(l?.price??c.price)}${l?.status==='sold'?' · SOLD':''}</div></div>${l?`<button class="btn ghost sm" data-open="${esc(l.id)}">View item</button>`:''}${!isBuyer&&l&&l.status!=='sold'?`<button class="btn green sm" id="chatSold">Mark sold</button>`:''}</div>
+  <div class="msgs" id="msgs"><div class="loading">Loading messages…</div></div>
+  ${isBuyer?`<div class="quick">${['Is this still available?','Can you do a lower price?','When can we meet?'].map(q=>`<button data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`:''}
+  <form class="chat-input" id="chatForm"><input class="inp" name="t" placeholder="Type a message…" autocomplete="off" maxlength="500"><button class="btn">Send</button></form>`;
+}
+function drawMsgs(){
+  const el=$('#msgs'); if(!el) return;
+  el.innerHTML=S.msgs.length?S.msgs.map(m=>`<div class="msg ${m.from===S.uid?'me':''}">${esc(m.text)}<time>${new Date(m.at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</time></div>`).join(''):'<div class="hint" style="margin:auto;text-align:center">Say hello 👋</div>';
+  el.scrollTop=el.scrollHeight;
+}
+after.chats=()=>{
+  document.querySelectorAll('[data-cid]').forEach(b=>b.onclick=()=>{S.activeChat=b.dataset.cid;render()});
+  const c=S.chats.find(x=>x.id===S.activeChat);
+  if(!c){ subscribeMsgs(null); return; }
+  bindCards();
+  S.seenChats[c.id]=Date.now(); updateChatDot();
+  subscribeMsgs(c.id);
+  drawMsgs();
+  $('#chatBack').onclick=()=>{S.activeChat=null;render()};
+  const cs=$('#chatSold'); if(cs) cs.onclick=()=>markSold(S.listings.find(l=>l.id===c.listingId));
+  const form=$('#chatForm');
+  form.onsubmit=e=>{e.preventDefault();const t=form.t.value.trim();if(!t)return;form.t.value='';sendMsg(c,t)};
+  document.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>sendMsg(c,b.dataset.q));
+};
+let msgSubId=null;
+function subscribeMsgs(cid){
+  if(msgSubId===cid) return;
+  if(S.msgUnsub){S.msgUnsub();S.msgUnsub=null}
+  msgSubId=cid; S.msgs=[];
+  if(!cid||!S.live) return;
+  S.msgUnsub=S.db.collection(`chats/${cid}/messages`).orderBy('at','asc').limit(500).onSnapshot(snap=>{
+    S.msgs=snap.docs.map(d=>d.data()); if(S.activeChat===cid){drawMsgs();S.seenChats[cid]=Date.now()}
+  },()=>{ const el=$('#msgs'); if(el) el.innerHTML='<div class="hint" style="margin:auto">Messages are unavailable right now.</div>'; });
+}
+async function sendMsg(c,text){
+  const m={from:S.uid,text,at:Date.now()};
+  try{
+    await S.db.collection(`chats/${c.id}/messages`).add(m);
+    await S.db.doc('chats/'+c.id).update({lastText:text.slice(0,80),lastFrom:S.uid,updatedAt:m.at});
+  }catch(ex){ toast(ex?.code==='quota_exceeded'?'Chat storage is full':'Message not sent. Try again.') }
+}
+function updateChatDot(){
+  const n=S.chats.some(x=>x.lastFrom&&x.lastFrom!==S.uid&&x.updatedAt>(S.seenChats[x.id]||0)&&x.id!==(route()==='chats'?S.activeChat:null));
+  $('#chatDot').style.display=n?'block':'none';
+}
+
+/* green */
+function viewGreen(){
+  const st=stats();
+  const by={};
+  S.listings.forEach(l=>{ if(!by[l.sellerId]) by[l.sellerId]={id:l.sellerId,l,pts:0,sold:0}; const e=by[l.sellerId]; if(l.status==='sold'){e.pts+=10;e.sold++} else e.pts+=2; });
+  const board=Object.values(by).sort((a,b)=>b.pts-a.pts).slice(0,10);
+  return `<div class="wrap page">
+    <span class="tape green">Circular campus</span>
+    <h1 class="page-title">Green Points</h1>
+    <p class="page-sub">Every item passed on is one less thing in a landfill and one less new purchase. Earn 2 points for each listing and 10 for each item you sell.</p>
+    <div class="green-wrap">
+      <div class="leader">
+        <div style="padding:14px 16px;border-bottom:2px solid var(--ink);font-weight:800">Sustainability leaderboard</div>
+        ${board.length?board.map((e,i)=>`<div class="leader-row"><span class="rk">#${i+1}</span><div class="avatar" style="width:34px;height:34px;font-size:13px;background:${['var(--coral)','var(--teal)','var(--mustard)'][i]||'var(--ink2)'}">${esc(initials(nameOf(e.id,e.l)))}</div><div><b>${esc(nameOf(e.id,e.l))}</b><div class="hint">${e.sold} sold</div></div><span class="pts">${e.pts} pts</span></div>`).join(''):'<div class="loading">No activity yet</div>'}
+      </div>
+      <div class="impact">
+        <div><b>${st.sold}</b><span>items given a second life</span></div>
+        <div><b>${rupee(st.saved)}</b><span>saved by juniors vs. buying new</span></div>
+        <div><b>${st.co2} kg</b><span>CO₂ emissions avoided (rough per-category estimate)</span></div>
+        <div><b>${st.sellers}</b><span>students taking part</span></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* about */
+function viewAbout(){
+  return `<div class="wrap page">
+    <span class="tape">About the project</span>
+    <h1 class="page-title">Why this exists</h1>
+    <section style="margin-top:24px"><div class="quote" style="background:var(--coral)">🚩 There's no trusted, campus-only place where graduating seniors can sell their books and gear to the juniors who need them. So seniors throw things out, juniors pay full price, and the reuse cycle on campus breaks down.<small>— PROBLEM STATEMENT</small></div></section>
+    <section>
+      <div class="sec-head"><h2>Objectives</h2></div>
+      <div class="about-grid">
+        <div class="obj"><span class="tape">OBJECTIVE 1</span><p>A central campus marketplace where students can list, browse and buy pre-owned items within their own university.</p></div>
+        <div class="obj"><span class="tape teal">OBJECTIVE 2</span><p>Trust and safety through university email verification (.edu or institutional ID login).</p></div>
+        <div class="obj"><span class="tape green">OBJECTIVE 3</span><p>Sustainability: extend the life of academic and personal resources on campus, and keep the platform free for students.</p></div>
+        <div class="obj"><span class="tape ink">OBJECTIVE 4</span><p>Academic categories: textbooks by semester and branch, lab kits, stationery, electronics, hostel furniture.</p></div>
+      </div>
+    </section>
+    <section>
+      <div class="sec-head"><h2>Research basis</h2></div>
+      <div class="roadmap">
+        <div>Ellen MacArthur Foundation (2019): universities suit circular reuse models, yet under 5% run structured reuse programs.</div>
+        <div>Chu &amp; Liao (2021): niche, community-driven marketplaces beat generic ones on trust and retention.</div>
+        <div>NASPA (2020): 78% of students would rather buy from verified peers at their institution.</div>
+      </div>
+    </section>
+    <section>
+      <div class="sec-head"><h2>Tech stack (production plan)</h2></div>
+      <div class="stack">
+        <div><small>Frontend</small><b>React.js + Tailwind CSS</b></div>
+        <div><small>Backend</small><b>Node.js + Express.js</b></div>
+        <div><small>Database</small><b>MongoDB Atlas</b></div>
+        <div><small>Auth</small><b>Firebase Auth / JWT</b></div>
+        <div><small>Real-time chat</small><b>Socket.io</b></div>
+        <div><small>Hosting</small><b>Vercel + Render</b></div>
+        <div><small>Version control</small><b>Git &amp; GitHub</b></div>
+      </div>
+    </section>
+    <section>
+      <div class="sec-head"><h2>Roadmap</h2></div>
+      <div class="roadmap">
+        <div><i class="done">LIVE</i>Multi-photo listings (up to 3 per item)</div>
+        <div><i class="done">LIVE</i>Green Points &amp; sustainability leaderboard</div>
+        <div><i>NEXT</i>UPI / Razorpay in-app payments</div>
+        <div><i>NEXT</i>Push alerts for new listings &amp; price drops</div>
+        <div><i>NEXT</i>Admin dashboard with sustainability analytics</div>
+        <div><i>NEXT</i>Ratings, reviews &amp; dispute resolution</div>
+        <div><i>NEXT</i>Multi-campus expansion</div>
+        <div><i>NEXT</i>Digital sharing: notes, PYQs, project files</div>
+      </div>
+    </section>
+    ${S.isOwner&&S.live?`<section><div class="sec-head"><h2>Admin settings</h2><span class="tape ink">Owner only</span></div>
+      <form class="panel" id="cfgForm" style="display:flex;flex-direction:column;gap:14px;max-width:560px">
+        <div class="field"><label>Campus email domains</label><input class="inp" name="domains" value="${esc(S.config.domains)}"><span class="hint">Comma-separated. Entries starting with “.” match any address ending that way; others match the exact domain.</span></div>
+        <label class="switch"><input type="checkbox" name="req" ${S.config.requireVerified?'checked':''}> Only campus-verified students can sell and chat</label>
+        <button class="btn" style="align-self:flex-start">Save settings</button>
+      </form></section>`:''}
+    <section><div class="quote">“Sustainability and affordability aren't competing goals. They reinforce each other.”<small>— Aditi Singh &amp; Ananya Chaudhary · Guide: Ms. Rukhsar Saifi · Dept. of CSE, IIMTU</small></div></section>
+  </div>`;
+}
+after.about=()=>{
+  const f=$('#cfgForm'); if(!f) return;
+  f.onsubmit=async e=>{e.preventDefault();const cfg={domains:f.domains.value.trim(),requireVerified:f.req.checked};
+    try{ await S.db.doc('config/settings').set(cfg); toast('Settings saved'); }catch{ toast('Couldn\'t save settings') } };
+};
+
+function updateBanner(){
+  const b=$('#banner');
+  let msg='';
+  if(!S.live && !S.loading) msg='Preview mode: showing sample listings. Open the page on claude.ai while signed in to use the shared marketplace.';
+  else if(S.stale) msg='Can\'t reach the marketplace right now. Listings may be out of date.';
+  else if(S.live && !S.canWrite) msg='You have view-only access. Ask the owner for Contributor access to sell and chat.';
+  b.textContent=msg; b.classList.toggle('hidden',!msg);
+}
+
+/* ---------- names ---------- */
+let nameTimer=null;
+function resolveNames(){
+  if(!S.user) return;
+  clearTimeout(nameTimer);
+  nameTimer=setTimeout(async()=>{
+    const ids=[...new Set([...S.listings.filter(l=>!l.sellerLabel).map(l=>l.sellerId),...S.chats.flatMap(c=>c.participants||[])])].filter(id=>id&&!(id in S.names));
+    if(!ids.length) return;
+    try{ const ps=await S.user.profiles(ids); ids.forEach(id=>S.names[id]=ps?.[id]?.name||'Student'); rerenderSoft(); }catch{}
+  },50);
+}
+function rerenderSoft(){
+  const r=route();
+  if(r==='browse') return drawResults();
+  if(r==='chats'){ const inp=$('#chatForm input'); const val=inp?.value; const focused=document.activeElement===inp; render(); if(inp){const n=$('#chatForm input'); if(n){n.value=val||''; if(focused)n.focus();}} return; }
+  if(r==='sell') return updateBanner();
+  render();
+}
+
+/* ---------- boot ---------- */
+S.listings=DEMO.slice(); S.uid='you';
+render();
+
+(async()=>{
+  if(!window.claude?.use) return;
+  S.loading=true; render();
+  let db=null,user=null;
+  try{ [db,user]=await Promise.all([claude.use('db'),claude.use('user')]); }catch{}
+  if(!db){ S.loading=false; render(); return; }
+  S.db=db; S.user=user;
+  try{ S.uid = user ? await user.id() : null; }catch{}
+  try{ S.me = user ? await user.me() : null; }catch{}
+  S.isOwner = user?.isOwner?.() ?? false;
+  try{ const cw=await user?.can?.('data.write'); S.canWrite = cw!==false; }catch{}
+  if(!S.uid){ S.loading=false; render(); return; }
+  S.live=true; S.listings=[]; S.chats=[];
+
+  const timer=setTimeout(()=>{ S.stale=true; S.loading=false; rerenderSoft(); },10000);
+  S.db.collection('listings').orderBy('createdAt','desc').limit(600).onSnapshot(snap=>{
+    S.listings=snap.docs.map(d=>({...d.data(),id:d.id}));
+    if(!snap.metadata.fromCache){ clearTimeout(timer); S.stale=false; }
+    S.loading=false; resolveNames(); rerenderSoft();
+  },()=>{ clearTimeout(timer); S.loading=false; S.stale=true; rerenderSoft(); });
+
+  S.db.collection('chats').where('participants','array-contains',S.uid).onSnapshot(snap=>{
+    S.chats=snap.docs.map(d=>({...d.data(),id:d.id})); resolveNames();
+    if(route()==='chats'){ rerenderSoft(); } else { updateChatDot(); }
+  },()=>{});
+
+  S.db.doc('config/settings').onSnapshot(d=>{ if(d.exists){ S.config={...S.config,...d.data()}; rerenderSoft(); } },()=>{});
+  try{ const p=await S.db.doc(`data/users/${S.uid}/prefs`).get(); if(p.exists) S.saved=new Set(p.data().saved||[]); }catch{}
+})();
+</script>
+</body>
+</html>
